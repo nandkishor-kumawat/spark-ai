@@ -7,6 +7,30 @@ html,body{
   width: 100%;
 }
 
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+      width: 5px;
+      /* height: 20px; */
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+      /* border-radius: 100vh; */
+      /* background: #26262c; */
+      background: transparent;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+      background: rgb(56, 56, 56);
+      /* border-radius: 100vh; */
+      /* border: 3px solid #dcf500; */
+  }
+
+  /* .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #0e0f2e;
+  } */
+}
+ 
+
 @layer base {
   :root {
     --background: 0 0% 100%;

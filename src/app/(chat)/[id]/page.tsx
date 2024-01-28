@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   }));
 
   return (
-    <div className="w-full h-full flex flex-col items-center gap-2">
+    <div className="w-full h-full flex flex-col items-center gap-2 overflow-hidden">
       <div className="flex flex-1 w-full overflow-auto scrollbar">
         <div className="flex flex-1 w-full p-2">
           <div className="flex flex-col pb-9 text-sm w-full">

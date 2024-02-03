@@ -49,7 +49,7 @@ const Chat = ({ data, isLast }: { data: Content, isLast?: boolean }) => {
                         <div>
                             <Avatar>
                                 <AvatarImage src={role==='user'?(session?.user.image as string):''} />
-                                <AvatarFallback>{role==='user'?(session?.user.name?.charAt(0) as string):'M'}</AvatarFallback>
+                                <AvatarFallback>{role==='user'?(session?.user.name?.charAt(0) as string):'AI'}</AvatarFallback>
                             </Avatar>
                         </div>
                     </div>

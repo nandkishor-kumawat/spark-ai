@@ -8,12 +8,12 @@ function Layout({ children, params }: { children: React.ReactNode, params: { id:
     return (
         <div className="w-full h-full">
             <div className="flex w-full h-full">
-                <div className="md:block hidden sidebar w-[260px] border-[#464e5d] border-r h-full">
+                <div className="md:block hidden sidebar min-w-[260px] border-[#464e5d] border-r h-full">
                     <Sidebar />
                 </div>
 
                 <div className="flex flex-col flex-1 h-full justify-center">
-                <Navbar />
+                    <Navbar />
                     {children}
                 </div>
             </div>

@@ -94,6 +94,10 @@ html,body{
     --ring: 240 4.9% 83.9%;
   }
 }
+
+.no-tailwindcss {
+  all: unset;
+}
  
 @layer base {
   * {

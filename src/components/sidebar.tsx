@@ -9,13 +9,15 @@ import { RedirectType, redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { MdLogout } from 'react-icons/md'
+import { RxExternalLink } from "react-icons/rx";
 
 const Sidebar = async () => {
   const groups = await prisma.groups.findMany({
     orderBy: {
       created_at: 'desc'
     }
-  })
+  });
+
   const data = await getAuthSession();
 
   const newChat = async () => {
@@ -30,10 +32,10 @@ const Sidebar = async () => {
 
   return (
     <div className='w-full flex flex-col h-full'>
-      <div className='w-full px-3'>
-        <div className='w-full mt-3 mb-1 hover:bg-zinc-700 rounded-md flex justify-between items-center transition-all ease-linear duration-150'>
-          <form action={newChat} className="flex-1 px-4 py-1.5">
-            <button type="submit" className='w-full px-2 py-1.5 text-left'>New Chat</button>
+      <div className='w-full px-3 pb-2 pt-3'>
+        <div className='w-full mb-1 hover:bg-zinc-700 rounded-md flex justify-between items-center transition-all ease-linear duration-150'>
+          <form action={newChat} className="flex-1 px-4 py-1">
+            <button type="submit" className='w-full px-2 py-1 text-left'>New Chat</button>
           </form>
           <button className='px-4 py-1.5'>
             <FaEdit />
@@ -41,21 +43,25 @@ const Sidebar = async () => {
         </div>
       </div>
 
-      <div className="flex-1 border-t border-t-zinc-600 flex flex-col my-2 p-2">
+      <div className="flex-1 border-t border-t-zinc-600 flex flex-col p-2">
         {
           groups.map((group) => <SidebarItem key={group.id} group={group} />)
         }
       </div>
-
-      <div className='w-full px-2'>
-        <div className='w-full my-3 p-2 hover:bg-zinc-700 rounded-md flex justify-between items-center transition-all ease-linear duration-150'>
-          <Avatar>
+      <div className="w-full px-2 py-2">
+        <Link href={'/vision'} className='px-4 w-full bg-red text-zinc-400 flex' target='_blank'>
+          <span>Chat with images </span> <RxExternalLink />
+        </Link>
+      </div>
+      <div className='w-full px-2 border-t border-t-zinc-800 hover:bg-zinc-700 transition-all ease-linear duration-150'>
+        <div className='w-full my-1 px-2 py-2 rounded-md flex justify-between items-center'>
+          <Avatar className='h-8 w-8'>
             <AvatarImage src={data?.user.image as string} />
             <AvatarFallback>{data?.user.name?.charAt(0) as string}</AvatarFallback>
           </Avatar>
-          <p>{data?.user.name}</p>
+          <p className='text-zinc-300'>{data?.user.name}</p>
           <Link href={'/api/auth/signout'} className='p-2 hover:bg-zinc-900 transition-all ease-linear duration-150 rounded-md'>
-            <MdLogout />
+            <MdLogout className='text-zinc-400' />
           </Link>
         </div>
       </div>

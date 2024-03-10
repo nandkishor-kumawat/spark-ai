@@ -12,7 +12,7 @@ import Sidebar from './sidebar';
 
 const Navbar = () => {
     return (
-        <div className="border-b border-b-[#464e5d] w-full p-2 flex items-center">
+        <div className="border-b border-b-[#464e5d] w-full p-2 flex items-center md:hidden">
             <Sheet>
                 <SheetTrigger className='p-2 block md:hidden'>
                     <RiMenu4Line className='w-5 h-5' />

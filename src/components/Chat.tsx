@@ -11,7 +11,7 @@ const Chat = ({ data, isLast }: { data: Content, isLast?: boolean }) => {
     const { role, parts } = data;
     const text = parts[0].text!;
     const [prompt, setPrompt] = React.useState<string>(text);
-    const {data:session} = useSession()
+    const { data: session } = useSession()
 
     const markdownPreviewRef = useRef<MarkdownPreviewRef>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -48,16 +48,16 @@ const Chat = ({ data, isLast }: { data: Content, isLast?: boolean }) => {
                     <div className='flex-shrink-0 flex flex-col relative items-end'>
                         <div>
                             <Avatar>
-                                <AvatarImage src={role==='user'?(session?.user.image as string):''} />
-                                <AvatarFallback>{role==='user'?(session?.user.name?.charAt(0) as string):'AI'}</AvatarFallback>
+                                <AvatarImage src={role === 'user' ? (session?.user.image as string) : ''} />
+                                <AvatarFallback>{role === 'user' ? (session?.user.name?.charAt(0) as string) : 'AI'}</AvatarFallback>
                             </Avatar>
                         </div>
                     </div>
 
                     <div className='relative flex w-full flex-col'>
-                        <div className='pb-2'>{role==='user'?'You':'AI'}</div>
+                        <div className='pb-2'>{role === 'user' ? 'You' : 'AI'}</div>
 
-                        {text && <div className="flex overflow-hidden">
+                        {text && <div className="flex overflow-hidden overflow-x-auto no-tailwindcss">
                             <MarkdownPreview
                                 ref={markdownPreviewRef}
                                 source={text}

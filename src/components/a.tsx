@@ -135,7 +135,16 @@ export default function Home() {
     setLoading(false);
 
   }
-
+  async function fileToGenerativePart(file: File) {
+    const base64EncodedDataPromise = new Promise((resolve) => {
+      const reader = new FileReader() as any;
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.readAsDataURL(file);
+    });
+    return {
+      inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+    };
+  }
 
   const handleFileUpload = async (e: any) => {
     const file = e.target.files[0];

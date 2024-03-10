@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+type GenerativeContentBlob {
+  mimeType String
+  data     String
+}
+
+type Media {
+  inlineData GenerativeContentBlob
+}
+
 model Chats {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   created_at DateTime @default(now())
@@ -16,6 +25,7 @@ model Chats {
   role       String
   user_id    String   @db.ObjectId
   user       Users    @relation(fields: [user_id], references: [id])
+  images     Media[]
 }
 
 model Groups {
@@ -27,12 +37,12 @@ model Groups {
 }
 
 model Users {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  email String  @unique
-  image String?
-  role  String
-  chats Chats[]
-  groups Groups[]
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  email      String   @unique
+  image      String?
+  role       String
+  chats      Chats[]
+  groups     Groups[]
   created_at DateTime @default(now())
 }

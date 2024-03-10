@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useTransition } from 'react'
 import { toast } from "sonner"
-import { MdDeleteForever } from 'react-icons/md'
+import { MdDeleteForever, MdEdit } from 'react-icons/md'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -41,10 +41,10 @@ const SidebarItem = ({ group }: any) => {
     return (
         <div className={`w-full group mb-0.5 hover:bg-zinc-700 ${params.id === group.id ? 'bg-zinc-700' : ''} rounded-md flex justify-between items-center transition-all ease-linear duration-150`}>
             <Link href={`/${group.id}`} className='flex-1 px-4 py-1.5'>{group.name}</Link>
-
+            {/* <MdEdit className='group-hover:visible invisible hover:text-white text-zinc-400 cursor-pointer' /> */}
             <AlertDialog>
                 <AlertDialogTrigger className='group-hover:visible invisible px-4 py-1.5'>
-                    <MdDeleteForever className='hover:text-red-500' />
+                    <MdDeleteForever className='hover:text-red-500 text-zinc-400' />
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>

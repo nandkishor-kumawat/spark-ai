@@ -1,25 +1,71 @@
 "use client"
-import { addChatData, addGroupData, sendMessage } from '@/actions'
+import { addChatData, addGroupData, genrateVisionProContent, sendMessage } from '@/actions'
 import { Chat } from '@/lib/types';
 import { addDummyModelChat, addModelChat, addUserChat } from '@/redux/features/chatSlice';
 import { useAppDispatch } from '@/redux/store'
+import { InlineDataPart } from '@google/generative-ai';
 import { useSession } from 'next-auth/react';
 import { redirect, useParams, useRouter } from 'next/navigation';
-import React, { use, useTransition } from 'react'
+import React, { useTransition } from 'react'
 
-const ChatForm = () => {
+const ChatForm = ({ vision }: { vision?: boolean }) => {
 
     const dispatch = useAppDispatch();
     const [isPending, startTransition] = useTransition();
     const { id } = useParams();
     const router = useRouter();
     const formRef = React.useRef<HTMLFormElement>(null);
-    const { data } = useSession()
+    const { data } = useSession();
+    const [files, setFiles] = React.useState<FileList | null>(null);
+
+    async function fileToGenerativePart(file: File) {
+        const base64EncodedDataPromise = new Promise((resolve) => {
+            const reader = new FileReader() as any;
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(file);
+        });
+        return {
+            inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+        };
+    }
+
+    const handleVisionChat = async (prompt: string) => {
+        if (!files) return;
+        const imageParts = await Promise.all(
+            Array.from(files).map(fileToGenerativePart)
+        ) as InlineDataPart[];
+
+        const group_id = "65edbe938dc79309d5143a85"
+        startTransition(async () => {
+            const chat = await addChatData({
+                user_id: data?.user.id as string,
+                group_id,
+                message: prompt,
+                role: 'user',
+                images: imageParts,
+                model: 'gemini-pro-vision',
+            });
+
+            dispatch(addUserChat(chat as Chat));
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            dispatch(addDummyModelChat());
+        })
+
+        startTransition(async () => {
+            const chat = await genrateVisionProContent(prompt, imageParts, group_id) as any;
+            dispatch(addModelChat(chat as Chat));
+        })
+        formRef.current!.reset();
+    }
 
     const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const prompt = formData.get('prompt') as string;
+
+        if (vision) return handleVisionChat(prompt);
 
         let group_id = id as string;
         if (!id) {
@@ -54,6 +100,14 @@ const ChatForm = () => {
         formRef.current!.reset();
     }
 
+
+
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFiles(e.target.files!);
+    }
+
+
     return (
         <div className="w-full m-2 md:pt-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:w-[calc(100%-.5rem)]">
             <div className="stretch mx-2 flex flex-row gap-3  md:mx-4 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
@@ -64,19 +118,21 @@ const ChatForm = () => {
                         </div>
                         <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
                             <div className="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
-                                <label htmlFor="file-upload" className="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
-                                    <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                                        <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-                                    </svg>
-                                    {/* <input id="file-upload" type="file" className="sr-only" onChange={handleFileUpload} /> */}
-                                </label>
+                                {vision && (
+                                    <label htmlFor="file-upload" className="inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                                        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                            <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+                                        </svg>
+                                        <input required id="file-upload" type="file" multiple accept='image/png, image/jpeg, image/webp, image/heic, image/heif' name='files' className="sr-only" onChange={handleFileUpload} />
+                                    </label>
+                                )}
                                 {/* {Object.values(MODELS).map((model) => (
                                     <button key={model} type="button" onClick={() => setModelName(model)} className={`inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 ${modelName === model ? 'bg-gray-100 dark:bg-gray-600' : ''}`}>
                                         {model}</button>
                                 ))} */}
                             </div>
                             <button type="submit" className="inline-flex items-center py-2.5 px-4 text-md font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
-                                {isPending?'Generating...':'Generate'}
+                                {isPending ? 'Generating...' : 'Generate'}
                             </button>
                         </div>
                     </div>

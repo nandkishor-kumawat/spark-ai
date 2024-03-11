@@ -12,7 +12,7 @@ import { MdLogout } from 'react-icons/md'
 import { RxExternalLink } from "react-icons/rx";
 
 const Sidebar = async () => {
-  const groups = await prisma.groups.findMany({
+  const groups = await prisma.group.findMany({
     orderBy: {
       created_at: 'desc'
     }

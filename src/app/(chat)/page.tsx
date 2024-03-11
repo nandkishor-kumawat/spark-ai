@@ -1,6 +1,5 @@
 import React from 'react'
 import { getAuthSession } from '../api/auth/[...nextauth]/options'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { addGroupData } from '@/actions'
 import { revalidatePath } from 'next/cache'

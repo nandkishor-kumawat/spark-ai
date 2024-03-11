@@ -1,44 +1,29 @@
 "use server"
 import { getAuthSession } from "@/app/api/auth/[...nextauth]/options";
-import { Chat } from "@/lib/types";
 import prisma from "@/prisma";
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, InlineDataPart } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, InlineDataPart, InputContent } from "@google/generative-ai";
 import { revalidatePath } from "next/cache";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
 export const addGroupData = async (data: any) => {
-    const group = await prisma.groups.create({
-        data
-    })
-    return group
+    return await prisma.group.create({ data })
 }
 
 export const addChatData = async (data: any) => {
-    return await prisma.chats.create({
-        data
-    })
+    return await prisma.query.create({ data })
 }
 
 export const deleteGroupChat = async (id: string) => {
     await prisma.$transaction([
-        prisma.chats.deleteMany({
-            where: {
-                group_id: id
-            }
-        }),
-        prisma.groups.delete({
-            where: {
-                id
-            }
-        })
+        prisma.query.deleteMany({ where: { group_id: id } }),
+        prisma.group.delete({ where: { id } })
     ])
 
     revalidatePath('/', 'page');
-
 }
 
-export const sendMessage = async ({ prompt, group_id }: { prompt: string, group_id: string }) => {
+export const sendMessage = async ({ prompt, group_id, chat_id }: { prompt: string, group_id: string, chat_id: string }) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const session = await getAuthSession()
     const user_id = session?.user?.id as string;
@@ -71,7 +56,7 @@ export const sendMessage = async ({ prompt, group_id }: { prompt: string, group_
         },
     ];
 
-    const allHistory = await prisma.chats.findMany({
+    const allHistory = await prisma.query.findMany({
         where: {
             user_id: session?.user?.id,
             group_id
@@ -81,11 +66,13 @@ export const sendMessage = async ({ prompt, group_id }: { prompt: string, group_
         }
     })
 
-    allHistory.pop();
-    const history = allHistory.map((chat) => ({
-        role: chat.role,
-        parts: [{ text: chat.message }]
-    }));
+    const history = allHistory.flatMap(curr => [
+        { role: 'user', parts: [{ text: curr.message }] },
+        { role: 'model', parts: [{ text: curr.response }] }
+    ]) as InputContent[];
+
+    history.pop();
+    history.pop();
 
     const chat = model.startChat({
         history: history,
@@ -97,32 +84,22 @@ export const sendMessage = async ({ prompt, group_id }: { prompt: string, group_
         const result = await chat.sendMessage(prompt);
         const response = result.response;
         const text = response.text();
-        console.log(text)
-        return await prisma.chats.create({
-            data: {
-                user_id,
-                group_id,
-                message: text,
-                role: 'model',
-                model: 'gemini-pro'
-            }
+
+        return await prisma.query.update({
+            where: { id: chat_id },
+            data: { response: text }
         })
     } catch (error) {
         console.log(error)
-        return await prisma.chats.create({
-            data: {
-                user_id,
-                group_id,
-                message: 'Error while generating response',
-                role: 'model',
-                model: 'gemini-pro'
-            }
+        return await prisma.query.update({
+            where: { id: chat_id },
+            data: { response: 'Error while generating response' }
         })
     }
 }
 
 
-export const genrateVisionProContent = async (prompt: string, imageParts: InlineDataPart[], group_id: string) => {
+export const genrateVisionProContent = async (prompt: string, imageParts: InlineDataPart[], chat_id: string) => {
 
     const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
     const session = await getAuthSession()
@@ -130,30 +107,21 @@ export const genrateVisionProContent = async (prompt: string, imageParts: Inline
 
     try {
         const result = await model.generateContent([prompt, ...imageParts]);
-        const response = await result.response;
+        const response = result.response;
         const text = response.text();
-        console.log(text);
 
-        return await prisma.chats.create({
-            data: {
-                user_id,
-                group_id,
-                message: text,
-                role: 'model',
-                model: 'gemini-pro-vision',
-                images: imageParts
-            }
+        const images = imageParts.map((image) => ({ ...image.inlineData }))
+
+        return await prisma.query.update({
+            where: { id: chat_id },
+            data: { response: text }
         })
+
     } catch (error) {
         console.log(error);
-        return await prisma.chats.create({
-            data: {
-                user_id,
-                group_id,
-                message: 'Error while generating response',
-                role: 'model',
-                model: 'gemini-pro-vision'
-            }
+        return await prisma.query.update({
+            where: { id: chat_id },
+            data: { response: 'Error while generating response' }
         })
     }
 }

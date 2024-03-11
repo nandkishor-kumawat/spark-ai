@@ -8,41 +8,38 @@ datasource db {
 }
 
 type GenerativeContentBlob {
-  mimeType String
-  data     String
+  mimeType String?
+  data     String?
 }
 
-type Media {
-  inlineData GenerativeContentBlob
-}
-
-model Chats {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  created_at DateTime @default(now())
-  group_id   String   @db.ObjectId
-  message    String
-  model      String
-  role       String
-  user_id    String   @db.ObjectId
-  user       Users    @relation(fields: [user_id], references: [id])
-  images     Media[]
-}
-
-model Groups {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  created_at DateTime @default(now())
-  name       String
-  user_id    String   @db.ObjectId
-  user       Users    @relation(fields: [user_id], references: [id])
-}
-
-model Users {
+model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   email      String   @unique
   image      String?
   role       String
-  chats      Chats[]
-  groups     Groups[]
+  queries    Query[]
+  groups     Group[]
   created_at DateTime @default(now())
+}
+
+model Query {
+  id         String                  @id @default(auto()) @map("_id") @db.ObjectId
+  created_at DateTime                @default(now())
+  updated_at DateTime                @updatedAt
+  group_id   String                  @db.ObjectId
+  message    String
+  model      String
+  images     GenerativeContentBlob[]
+  user_id    String                  @db.ObjectId
+  user       User                    @relation(fields: [user_id], references: [id])
+  response   String?
+}
+
+model Group {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  created_at DateTime @default(now())
+  name       String
+  user_id    String   @db.ObjectId
+  user       User     @relation(fields: [user_id], references: [id])
 }

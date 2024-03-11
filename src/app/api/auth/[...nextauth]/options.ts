@@ -7,14 +7,14 @@ export const options: NextAuthOptions = {
     providers: [
         GoogleProvider({
             async profile(profile) {
-                const user = await prisma.users.findUnique({
+                const user = await prisma.user.findUnique({
                     where: {
                         email: profile.email
                     }
                 });
                 if(user) return user as DefaultUser;
                 else {
-                    return await prisma.users.create({
+                    return await prisma.user.create({
                         data: {
                             name: profile.name,
                             email: profile.email,

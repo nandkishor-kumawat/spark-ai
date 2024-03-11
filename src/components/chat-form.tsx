@@ -1,11 +1,12 @@
 "use client"
 import { addChatData, addGroupData, genrateVisionProContent, sendMessage } from '@/actions'
-import { Chat } from '@/lib/types';
+import { MODELS } from '@/lib/constants';
+import { QueryType } from '@/lib/types';
 import { addDummyModelChat, addModelChat, addUserChat } from '@/redux/features/chatSlice';
 import { useAppDispatch } from '@/redux/store'
 import { InlineDataPart } from '@google/generative-ai';
 import { useSession } from 'next-auth/react';
-import { redirect, useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useTransition } from 'react'
 
 const ChatForm = ({ vision }: { vision?: boolean }) => {
@@ -15,7 +16,7 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
     const { id } = useParams();
     const router = useRouter();
     const formRef = React.useRef<HTMLFormElement>(null);
-    const { data } = useSession();
+    const { data: session } = useSession();
     const [files, setFiles] = React.useState<FileList | null>(null);
 
     async function fileToGenerativePart(file: File) {
@@ -31,32 +32,26 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
 
     const handleVisionChat = async (prompt: string) => {
         if (!files) return;
-        const imageParts = await Promise.all(
-            Array.from(files).map(fileToGenerativePart)
-        ) as InlineDataPart[];
+        const imageParts = await Promise.all(Array.from(files).map(fileToGenerativePart)) as InlineDataPart[];
 
         const group_id = "65edbe938dc79309d5143a85"
         startTransition(async () => {
-            const chat = await addChatData({
-                user_id: data?.user.id as string,
+            const data = {
+                user_id: session?.user.id as string,
                 group_id,
                 message: prompt,
-                role: 'user',
-                images: imageParts,
-                model: 'gemini-pro-vision',
-            });
-
-            dispatch(addUserChat(chat as Chat));
-
+                images: imageParts.map((image) => ({ ...image.inlineData })),
+                model: MODELS.VISION,
+                response: 'Generating...'
+            }
+            dispatch(addUserChat(data as QueryType));
+            const chat = await addChatData(data);
+            const response = await genrateVisionProContent(prompt, imageParts, chat.id) as any;
+            console.log(response)
             await new Promise(resolve => setTimeout(resolve, 500));
-
-            dispatch(addDummyModelChat());
+            dispatch(addModelChat(response as QueryType));
         })
 
-        startTransition(async () => {
-            const chat = await genrateVisionProContent(prompt, imageParts, group_id) as any;
-            dispatch(addModelChat(chat as Chat));
-        })
         formRef.current!.reset();
     }
 
@@ -71,7 +66,7 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
         if (!id) {
             const group = await addGroupData({
                 name: prompt,
-                user_id: data?.user.id as string,
+                user_id: session?.user.id as string,
             })
             group_id = group.id;
             router.push(`/${group_id}`);
@@ -79,28 +74,21 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
 
         startTransition(async () => {
             const chat = await addChatData({
-                user_id: data?.user.id as string,
+                user_id: session?.user.id as string,
                 group_id: group_id,
                 message: prompt,
-                role: 'user',
-                model: 'gemini-pro'
+                model: MODELS.PRO,
+                response: 'Generating...'
             });
-            dispatch(addUserChat(chat as Chat));
 
+            dispatch(addUserChat(chat as QueryType));
+            const response = await sendMessage({ prompt, group_id, chat_id: chat.id });
+            console.log(response)
             await new Promise(resolve => setTimeout(resolve, 500));
-
-            dispatch(addDummyModelChat());
+            dispatch(addModelChat(response as QueryType));
         })
-
-        startTransition(async () => {
-            const chat = await sendMessage({ prompt, group_id });
-            dispatch(addModelChat(chat as Chat));
-        })
-
         formRef.current!.reset();
     }
-
-
 
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

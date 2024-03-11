@@ -1,9 +1,9 @@
-import { Chat } from "@/lib/types";
+import { QueryType } from "@/lib/types";
 import { Content } from "@google/generative-ai";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ChatState {
-    chats: Content[]
+    chats: QueryType[]
 }
 
 const initialState = {
@@ -14,12 +14,13 @@ export const chat = createSlice({
     name: "chat",
     initialState,
     reducers: {
-        initializeChats: (state, action: PayloadAction<Content[]>) => {
+        initializeChats: (state, action: PayloadAction<QueryType[]>) => {
             state.chats = action.payload
         },
-        addUserChat: (state, action: PayloadAction<Chat>) => {
-            const { message, ...chat } = action.payload;
-            state.chats.push({ ...chat, parts: [{ text: message }] });
+        addUserChat: (state, action: PayloadAction<QueryType>) => {
+            // const { message, ...chat } = action.payload;
+            // state.chats.push({ ...chat, parts: [{ text: message }] });
+            state.chats.push(action.payload);
         },
 
         addDummyModelChat: (state) => {
@@ -32,14 +33,16 @@ export const chat = createSlice({
                 model: 'gemini-pro',
                 created_at: new Date()
             }
-            const { message, ...chat } = action;
-            state.chats.push({ ...chat, parts: [{ text: message }] });
+            // const { message, ...chat } = action;
+            // state.chats.push({ ...chat, parts: [{ text: message }] });
+            state.chats.push(action);
         },
 
-        addModelChat: (state, action: PayloadAction<Chat>) => {
+        addModelChat: (state, action: PayloadAction<QueryType>) => {
             state.chats.pop();
-            const { message, ...chat } = action.payload;
-            state.chats.push({ ...chat, parts: [{ text: message }] });
+            // const { message, ...chat } = action.payload;
+            // state.chats.push({ ...chat, parts: [{ text: message }] });
+            state.chats.push(action.payload);
         }
 
     },

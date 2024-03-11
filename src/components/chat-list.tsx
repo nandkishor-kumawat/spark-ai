@@ -6,8 +6,6 @@ import Chat from './Chat';
 
 function ChatList({ history }: { history: any[] }) {
     const chats = useAppSelector((state) => state.chat.chats);
-
-
     const ref = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
@@ -27,8 +25,8 @@ function ChatList({ history }: { history: any[] }) {
                 </div>
             )}
             {
-                chats.map((data, i) => (
-                    <Chat key={i} data={data} isLast={(i === chats.length - 1) && (data.role === 'model')} />
+                chats.map((chat, i) => (
+                    <Chat key={i} chat={chat} isLast={(i === chats.length - 1)} />
                 ))
             }
             <div ref={ref}></div>

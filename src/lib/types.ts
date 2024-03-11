@@ -1,12 +1,12 @@
-import { Part } from "@google/generative-ai"
+import { GenerativeContentBlob } from "@google/generative-ai"
 
-export interface Chat {
+export interface QueryType {
     id: string
     group_id: string
     message: string
-    images?: Part[]
+    images?: GenerativeContentBlob[]
     model: string
-    role: string
     user_id: string
+    response?: string
     created_at: Date
 }

@@ -1,26 +1,16 @@
-
-import MarkdownPreview, { MarkdownPreviewRef } from '@uiw/react-markdown-preview';
-import Chat from "@/components/Chat";
-import { marked } from "marked";
 import ChatForm from "@/components/chat-form";
 import prisma from '@/prisma';
 import ChatList from '@/components/chat-list';
 import { Suspense } from 'react';
 import { getAuthSession } from '@/app/api/auth/[...nextauth]/options';
-
-
-const MODELS = {
-    PRO: 'gemini-pro',
-    VISION: 'gemini-pro-vision',
-}
-
+import { MODELS } from "@/lib/constants";
 
 
 export default async function Page({ params }: { params: { id: string } }) {
 
     const session = await getAuthSession();
 
-    const allHistory = await prisma.chats.findMany({
+    const history = await prisma.query.findMany({
         where: {
             user_id: session?.user.id,
             model: MODELS.VISION
@@ -29,10 +19,10 @@ export default async function Page({ params }: { params: { id: string } }) {
             created_at: 'asc'
         }
     })
-    const history = allHistory.map(({ message, ...chat }) => ({
-        ...chat,
-        parts: [{ text: message }]
-    }));
+    // const history = allHistory.map(({ message, ...chat }) => ({
+    //     ...chat,
+    //     parts: [{ text: message }]
+    // }));
 
     return (
         <div className="w-full h-full flex flex-col items-center gap-2 overflow-hidden">

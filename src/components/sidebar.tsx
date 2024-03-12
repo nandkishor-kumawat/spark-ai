@@ -43,7 +43,7 @@ const Sidebar = async () => {
         </div>
       </div>
 
-      <div className="flex-1 border-t border-t-zinc-600 flex flex-col p-2">
+      <div className="flex-1 border-t border-t-zinc-800 flex flex-col p-2">
         {
           groups.map((group) => <SidebarItem key={group.id} group={group} />)
         }

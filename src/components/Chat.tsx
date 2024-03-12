@@ -15,7 +15,6 @@ interface Props {
 }
 
 const Chat = ({ chat, isLast }: Props) => {
-
     const { message, images, model } = chat;
     const text = message;
     const [prompt, setPrompt] = React.useState<string>(text);

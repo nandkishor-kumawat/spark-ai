@@ -16,6 +16,8 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { deleteGroupChat } from '@/actions'
+import GroupRenameButton from './group-rename-button'
+import GroupDeleteButton from './group-delete-button'
 
 
 const SidebarItem = ({ group }: any) => {
@@ -23,43 +25,13 @@ const SidebarItem = ({ group }: any) => {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
-    const deleteChat = async () => {
-        startTransition(async () => {
-            const a = await deleteGroupChat(group.id);
-            console.log(a)
-
-            toast.success("Chat deleted successfully", {
-                style: {
-                    color: 'green',
-                },
-                position: 'top-center',
-                duration: 3000
-            });
-            if (params.id === group.id) router.replace('/');
-        })
-    }
     return (
         <div className={`w-full group mb-0.5 hover:bg-zinc-700 ${params.id === group.id ? 'bg-zinc-700' : ''} rounded-md flex justify-between items-center transition-all ease-linear duration-150`}>
             <Link href={`/${group.id}`} className='flex-1 px-4 py-1.5'>{group.name}</Link>
-            {/* <MdEdit className='group-hover:visible invisible hover:text-white text-zinc-400 cursor-pointer' /> */}
-            <AlertDialog>
-                <AlertDialogTrigger className='group-hover:visible invisible px-4 py-1.5'>
-                    <MdDeleteForever className='hover:text-red-500 text-zinc-400' />
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete your all chats from this group.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={deleteChat}>Continue</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
+            <div className="mx-2 space-x-1">
+                {/* <GroupRenameButton group={group} /> */}
+                <GroupDeleteButton group_id={group.id} />
+            </div>
         </div>
 
     )

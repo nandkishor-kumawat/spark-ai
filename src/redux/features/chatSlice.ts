@@ -17,6 +17,7 @@ export const chat = createSlice({
         initializeChats: (state, action: PayloadAction<QueryType[]>) => {
             state.chats = action.payload
         },
+
         addUserChat: (state, action: PayloadAction<QueryType>) => {
             // const { message, ...chat } = action.payload;
             // state.chats.push({ ...chat, parts: [{ text: message }] });

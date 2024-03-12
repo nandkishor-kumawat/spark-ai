@@ -1,4 +1,3 @@
-import ChatForm from '@/components/chat-form'
 import Navbar from '@/components/navbar'
 import Sidebar from '@/components/sidebar'
 import React from 'react'
@@ -8,7 +7,7 @@ function Layout({ children, params }: { children: React.ReactNode, params: { id:
     return (
         <div className="w-full h-full">
             <div className="flex w-full h-full">
-                <div className="md:block hidden sidebar min-w-[260px] border-[#464e5d] border-r h-full">
+                <div className="md:block hidden sidebar min-w-[260px] border-r-zinc-800 border-r h-full">
                     <Sidebar />
                 </div>
 

@@ -1,8 +1,8 @@
 "use client"
-import { addChatData, addGroupData, genrateVisionProContent, sendMessage } from '@/actions'
+import { addGroupData, genrateVisionProContent, sendMessage } from '@/actions'
 import { MODELS } from '@/lib/constants';
 import { QueryType } from '@/lib/types';
-import { addDummyModelChat, addModelChat, addUserChat } from '@/redux/features/chatSlice';
+import { addModelChat, addUserChat } from '@/redux/features/chatSlice';
 import { useAppDispatch } from '@/redux/store'
 import { InlineDataPart } from '@google/generative-ai';
 import { useSession } from 'next-auth/react';
@@ -43,13 +43,12 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
                 images: imageParts.map((image) => ({ ...image.inlineData })),
                 model: MODELS.VISION,
                 response: 'Generating...'
-            }
-            dispatch(addUserChat(data as QueryType));
-            const chat = await addChatData(data);
-            const response = await genrateVisionProContent(prompt, imageParts, chat.id) as any;
-            console.log(response)
-            await new Promise(resolve => setTimeout(resolve, 500));
-            dispatch(addModelChat(response as QueryType));
+            } as QueryType;
+
+            dispatch(addUserChat(data));
+
+            const response = await genrateVisionProContent(data) as QueryType;;
+            dispatch(addModelChat(response));
         })
 
         formRef.current!.reset();
@@ -73,19 +72,17 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
         }
 
         startTransition(async () => {
-            const chat = await addChatData({
+            const chat = {
                 user_id: session?.user.id as string,
                 group_id: group_id,
                 message: prompt,
                 model: MODELS.PRO,
                 response: 'Generating...'
-            });
+            } as QueryType;
 
-            dispatch(addUserChat(chat as QueryType));
-            const response = await sendMessage({ prompt, group_id, chat_id: chat.id });
-            console.log(response)
-            await new Promise(resolve => setTimeout(resolve, 500));
-            dispatch(addModelChat(response as QueryType));
+            dispatch(addUserChat(chat));
+            const response = await sendMessage(chat) as QueryType;
+            dispatch(addModelChat(response));
         })
         formRef.current!.reset();
     }

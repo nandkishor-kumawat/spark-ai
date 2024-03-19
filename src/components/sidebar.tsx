@@ -12,13 +12,18 @@ import { MdLogout } from 'react-icons/md'
 import { RxExternalLink } from "react-icons/rx";
 
 const Sidebar = async () => {
+  const data = await getAuthSession();
+
   const groups = await prisma.group.findMany({
+    where: {
+      user_id: data?.user.id
+    },
     orderBy: {
       created_at: 'desc'
     }
   });
 
-  const data = await getAuthSession();
+
 
   const newChat = async () => {
     "use server"

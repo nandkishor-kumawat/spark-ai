@@ -3,11 +3,23 @@ import prisma from '@/prisma';
 import ChatList from '@/components/chat-list';
 import { Suspense } from 'react';
 import { getAuthSession } from '@/app/api/auth/[...nextauth]/options';
+import { redirect } from "next/navigation";
 
 
 export default async function Page({ params }: { params: { id: string } }) {
 
   const session = await getAuthSession();
+
+  const isUserHasGroup = await prisma.group.findFirst({
+    where: {
+      id: params.id,
+      user_id: session?.user.id
+    }
+  });
+
+  if (!isUserHasGroup) {
+    redirect('/')
+  }
 
   const allHistory = await prisma.query.findMany({
     where: {

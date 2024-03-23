@@ -1,4 +1,5 @@
 
+"use client"
 import React, { useTransition } from 'react'
 import { MdDeleteForever } from 'react-icons/md'
 import {
@@ -25,8 +26,6 @@ export default function GroupDeleteButton({ group_id }: { group_id: string }) {
     const deleteGroup = async () => {
         startTransition(async () => {
             const a = await deleteGroupChat(group_id);
-            console.log(a)
-
             toast.success("Chat deleted successfully", {
                 style: {
                     color: 'green',

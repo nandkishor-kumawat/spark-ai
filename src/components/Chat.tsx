@@ -1,7 +1,6 @@
 "use client"
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import MarkdownPreview, { MarkdownPreviewRef } from '@uiw/react-markdown-preview';
-import { Content } from '@google/generative-ai';
 import rehypeSanitize from "rehype-sanitize";
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useSession } from 'next-auth/react';

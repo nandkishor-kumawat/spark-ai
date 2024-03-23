@@ -1,19 +1,21 @@
 "use server"
 import { getAuthSession } from "@/app/api/auth/[...nextauth]/options";
+import { MODELS } from "@/lib/constants";
 import { QueryType } from "@/lib/types";
 import prisma from "@/prisma";
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, InlineDataPart, InputContent } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, InputContent } from "@google/generative-ai";
 import { revalidatePath } from "next/cache";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
-export const addGroupData = async (data: any) => {
-    return await prisma.group.create({ data })
+export const addGroupData = async (data: any) => prisma.group.create({ data })
+export const addChatData = async (data: QueryType) => prisma.query.create({ data })
+
+export const renameGroupChat = async (id: string, name: string) => {
+    const a = await prisma.group.update({ where: { id }, data: { name } })
+    revalidatePath(`/${id}`)
 }
 
-export const addChatData = async (data: QueryType) => {
-    return await prisma.query.create({ data })
-}
 
 export const deleteGroupChat = async (id: string) => {
     await prisma.$transaction([
@@ -25,7 +27,7 @@ export const deleteGroupChat = async (id: string) => {
 }
 
 export const sendMessage = async (data: QueryType) => {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: MODELS.PRO });
     const session = await getAuthSession()
     const user_id = session?.user?.id as string;
     const { group_id, message } = data;
@@ -73,14 +75,11 @@ export const sendMessage = async (data: QueryType) => {
         { role: 'user', parts: [{ text: curr.message }] },
         { role: 'model', parts: [{ text: curr.response }] }
     ]) as InputContent[];
-    // console.log(history)
-    // history.pop();
-    // history.pop();
 
     const chat = model.startChat({
         history: history,
         generationConfig,
-        // safetySettings
+        safetySettings
     });
 
     try {
@@ -99,7 +98,7 @@ export const sendMessage = async (data: QueryType) => {
 
 export const genrateVisionProContent = async (data: QueryType) => {
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+    const model = genAI.getGenerativeModel({ model: MODELS.VISION });
     const session = await getAuthSession()
     const user_id = session?.user?.id as string;
 

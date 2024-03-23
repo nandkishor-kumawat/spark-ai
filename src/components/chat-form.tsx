@@ -1,5 +1,5 @@
 "use client"
-import { addGroupData, genrateVisionProContent, sendMessage } from '@/actions'
+import { genrateVisionProContent, sendMessage } from '@/actions'
 import { MODELS } from '@/lib/constants';
 import { QueryType } from '@/lib/types';
 import { addModelChat, addUserChat } from '@/redux/features/chatSlice';
@@ -62,14 +62,6 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
         if (vision) return handleVisionChat(prompt);
 
         let group_id = id as string;
-        if (!id) {
-            const group = await addGroupData({
-                name: prompt,
-                user_id: session?.user.id as string,
-            })
-            group_id = group.id;
-            router.push(`/${group_id}`);
-        }
 
         startTransition(async () => {
             const chat = {
@@ -111,10 +103,6 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
                                         <input required id="file-upload" type="file" multiple accept='image/png, image/jpeg, image/webp, image/heic, image/heif' name='files' className="sr-only" onChange={handleFileUpload} />
                                     </label>
                                 )}
-                                {/* {Object.values(MODELS).map((model) => (
-                                    <button key={model} type="button" onClick={() => setModelName(model)} className={`inline-flex justify-center items-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 ${modelName === model ? 'bg-gray-100 dark:bg-gray-600' : ''}`}>
-                                        {model}</button>
-                                ))} */}
                             </div>
                             <button type="submit" className="inline-flex items-center py-2.5 px-4 text-md font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
                                 {isPending ? 'Generating...' : 'Generate'}

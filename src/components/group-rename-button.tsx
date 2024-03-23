@@ -4,36 +4,27 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useParams, useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { renameGroupChat } from '@/actions';
 
 export default function GroupRenameButton({ group }: any) {
 
   const params = useParams();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const [name, setName] = React.useState(group.name);
+  const ref = React.useRef<HTMLButtonElement>(null);
 
   const renameGroup = async () => {
     startTransition(async () => {
-      // const a = await deleteGroupChat(group_id);
-      // console.log(a)
-
-      toast.success("Chat deleted successfully", {
-        style: {
-          color: 'green',
-        },
-        position: 'top-center',
-        duration: 3000
-      });
-
+      await renameGroupChat(group.id, name);
+      ref.current?.click();
     })
   }
 
@@ -56,11 +47,21 @@ export default function GroupRenameButton({ group }: any) {
             <Input
               id="name"
               defaultValue={group.name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={50}
             />
           </div>
-          <Button type="button" variant="secondary">
-            Rename
+          <Button type="button" variant="secondary" onClick={renameGroup} disabled={isPending}>
+            {isPending ? 'Renaming...' : 'Rename'}
           </Button>
+
+          <div className="hidden">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" ref={ref}>
+                Close
+              </Button>
+            </DialogClose>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

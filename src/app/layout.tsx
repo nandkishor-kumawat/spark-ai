@@ -24,9 +24,9 @@ export default function RootLayout({
         <Provider>
           <body className={inter.className}>
             <NextTopLoader template='<div class="bar" role="bar"><div class="peg"></div></div>' />
+            <Toaster />
             {children}
           </body>
-          <Toaster />
 
         </Provider>
       </ReduxProviders>

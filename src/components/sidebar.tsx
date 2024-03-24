@@ -8,8 +8,8 @@ import { getAuthSession } from '@/app/api/auth/[...nextauth]/options'
 import { RedirectType, redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { MdLogout } from 'react-icons/md'
 import { RxExternalLink } from "react-icons/rx";
+import SignoutButton from './signout-button'
 
 const Sidebar = async () => {
   const data = await getAuthSession();
@@ -49,9 +49,7 @@ const Sidebar = async () => {
       </div>
 
       <div className="flex-1 border-t border-t-zinc-800 flex flex-col p-2">
-        {
-          groups.map((group) => <SidebarItem key={group.id} group={group} />)
-        }
+        {groups.map((group) => <SidebarItem key={group.id} group={group} />)}
       </div>
       <div className="w-full px-2 py-2">
         <Link href={'/vision'} className='px-4 w-full bg-red text-zinc-400 flex' target='_blank'>
@@ -65,9 +63,7 @@ const Sidebar = async () => {
             <AvatarFallback>{data?.user.name?.charAt(0) as string}</AvatarFallback>
           </Avatar>
           <p className='text-zinc-300'>{data?.user.name}</p>
-          <Link href={'/api/auth/signout'} className='p-2 hover:bg-zinc-900 transition-all ease-linear duration-150 rounded-md'>
-            <MdLogout className='text-zinc-400' />
-          </Link>
+          <SignoutButton />
         </div>
       </div>
     </div>

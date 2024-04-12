@@ -10,6 +10,7 @@ import { revalidatePath } from 'next/cache'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { RxExternalLink } from "react-icons/rx";
 import SignoutButton from './signout-button'
+import { ScrollArea } from './ui/scroll-area'
 
 const Sidebar = async () => {
   const data = await getAuthSession();
@@ -48,9 +49,12 @@ const Sidebar = async () => {
         </div>
       </div>
 
-      <div className="flex-1 border-t border-t-zinc-800 flex flex-col p-2">
+
+      <ScrollArea className="flex-1 border-t border-t-zinc-800 flex flex-col p-2 scrollbar">
         {groups.map((group) => <SidebarItem key={group.id} group={group} />)}
-      </div>
+      </ScrollArea>
+
+
       <div className="w-full px-2 py-2">
         <Link href={'/vision'} className='px-4 w-full bg-red text-zinc-400 flex' target='_blank'>
           <span>Chat with images </span> <RxExternalLink />

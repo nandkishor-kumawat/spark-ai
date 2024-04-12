@@ -16,6 +16,7 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
     const { id } = useParams();
     const router = useRouter();
     const formRef = React.useRef<HTMLFormElement>(null);
+    const btnRef = React.useRef<HTMLButtonElement>(null);
     const { data: session } = useSession();
     const [files, setFiles] = React.useState<FileList | null>(null);
 
@@ -84,6 +85,21 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
         setFiles(e.target.files!);
     }
 
+    const onChange = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.shiftKey && e.key === 'Enter') {
+            e.preventDefault();
+            const textarea = e.target as HTMLTextAreaElement;
+            textarea.value += '\n';
+            textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+            return
+        }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            btnRef.current?.click();
+            return;
+        }
+
+    }
 
     return (
         <div className="w-full m-2 md:pt-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:w-[calc(100%-.5rem)]">
@@ -91,7 +107,7 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
                 <form ref={formRef} className="flex justify-between w-full gap-1 items-end" onSubmit={sendData}>
                     <div className="w-full border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                         <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800 relative">
-                            <textarea name="prompt" rows={4} className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400 p-2 outline-none resize-none" placeholder="Write a prompt..." required></textarea>
+                            <textarea onKeyDown={onChange} name="prompt" rows={4} className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400 p-2 outline-none resize-none" placeholder="Write a prompt..." required></textarea>
                         </div>
                         <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
                             <div className="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
@@ -104,7 +120,7 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
                                     </label>
                                 )}
                             </div>
-                            <button type="submit" className="inline-flex items-center py-2.5 px-4 text-md font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+                            <button type="submit" ref={btnRef} className="inline-flex items-center py-2.5 px-4 text-md font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
                                 {isPending ? 'Generating...' : 'Generate'}
                             </button>
                         </div>

@@ -74,22 +74,35 @@ const Chat = ({ chat, isLast }: Props) => {
 
                     <div className='relative flex w-full flex-col'>
                         <div className='pb-2'>{'AI'}</div>
-                        {chat.response && <div className="flex overflow-hidden overflow-x-auto no-tailwindcss">
-                            <MarkdownPreview
-                                ref={markdownPreviewRef}
-                                source={chat.response}
-                                // rehypeRewrite={(node, index, parent) => {
-                                //   if (node.tagName === "a" && parent && /^h(1|2|3|4|5|6)/.test(parent.tagName)) {
-                                //     parent.children = parent.children.slice(1)
-                                //   }
-                                // }}
-                                className='no-tailwindcss'
-                                style={{
-                                    backgroundColor: 'transparent',
-                                }}
-                                rehypePlugins={[rehypeSanitize]}
-                            />
-                        </div>}
+                        <div className="flex-1 overflow-x-auto">
+                            <div className="">
+                                {chat.response && <div className="flex overflow-hidden no-tailwindcss">
+                                    <MarkdownPreview
+                                        ref={markdownPreviewRef}
+                                        source={chat.response}
+                                        rehypeRewrite={(node, index, parent) => {
+                                            //   if (node.tagName === "a" && parent && /^h(1|2|3|4|5|6)/.test(parent.tagName)) {
+                                            //     parent.children = parent.children.slice(1)
+                                            //   }
+                                            if (node.type === "element" && node.tagName === "a") {
+                                                node.properties = {
+                                                    ...node.properties,
+                                                    target: "_blank",
+                                                    rel: "noopener noreferrer",
+                                                }
+                                                console.log(node.properties)
+                                            }
+                                        }}
+                                        className='no-tailwindcss overflow-hidden'
+                                        style={{
+                                            backgroundColor: 'transparent',
+                                        }}
+                                    // rehypePlugins={[rehypeSanitize]}
+                                    />
+                                </div>}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

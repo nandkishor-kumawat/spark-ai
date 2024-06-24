@@ -20,15 +20,21 @@ function ChatList({ history }: { history: any[] }) {
     return (
         <>
             {chats.length === 0 && (
-                <div className="w-full h-full flex justify-center items-center">
+                <div className="w-full h-full flex justify-center items-center" style={{
+                    marginTop: '50%',
+                    transform: 'translateY(-50%)'
+                }}>
                     <h1 className="text-3xl font-bold">No Chats Found</h1>
                 </div>
             )}
-            {
-                chats.map((chat, i) => (
-                    <Chat key={i} chat={chat} isLast={(i === chats.length - 1)} />
-                ))
-            }
+
+            <div className="w-full">
+                {
+                    chats.map((chat, i) => (
+                        <Chat key={i} chat={chat} isLast={(i === chats.length - 1)} />
+                    ))
+                }
+            </div>
             <div ref={ref}></div>
         </>
     )

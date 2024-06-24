@@ -23,9 +23,9 @@ const Chat = ({ chat, isLast }: Props) => {
     const ref = useRef<HTMLDivElement>(null);
 
     return (
-        <div className='w-full mb-2 text-primary'>
+        <div className='w-full text-primary'>
             <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
-                <div className="flex flex-1 text-base mx-auto gap-3 md:px-5 lg:px-1 xl:px-5 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] group">
+                <div className="flex flex-1 text-base mx-auto gap-3 md:px-5 lg:px-1 xl:px-5 w-full group">
                     <div className='flex-shrink-0 flex flex-col relative items-end'>
                         <div>
                             <Avatar>
@@ -51,7 +51,7 @@ const Chat = ({ chat, isLast }: Props) => {
                                             height={200}
                                             alt={'image'}
                                             src={`data:${image.mimeType};base64,${image.data}`}
-                                            className="object-contain"
+                                            className="object-contain w-2/3 h-auto"
                                         />
                                     })
                                 }
@@ -62,7 +62,7 @@ const Chat = ({ chat, isLast }: Props) => {
             </div>
 
             <div className="px-4 py-2 justify-center text-base md:gap-6 m-auto">
-                <div className="flex flex-1 text-base mx-auto gap-3 md:px-5 lg:px-1 xl:px-5 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem] group">
+                <div className="flex flex-1 text-base mx-auto gap-3 md:px-5 lg:px-1 xl:px-5 w-full group">
                     <div className='flex-shrink-0 flex flex-col relative items-end'>
                         <div>
                             <Avatar>
@@ -90,7 +90,6 @@ const Chat = ({ chat, isLast }: Props) => {
                                                     target: "_blank",
                                                     rel: "noopener noreferrer",
                                                 }
-                                                console.log(node.properties)
                                             }
                                         }}
                                         className='no-tailwindcss overflow-hidden'

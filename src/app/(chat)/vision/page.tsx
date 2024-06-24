@@ -1,4 +1,3 @@
-import ChatForm from "@/components/chat-form";
 import prisma from '@/prisma';
 import ChatList from '@/components/chat-list';
 import { Suspense } from 'react';
@@ -35,7 +34,6 @@ export default async function Page({ params }: { params: { id: string } }) {
                     </div>
                 </div>
             </div>
-            <ChatForm vision />
         </div>
 
     )

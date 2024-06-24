@@ -6,10 +6,12 @@ import { addModelChat, addUserChat } from '@/redux/features/chatSlice';
 import { useAppDispatch } from '@/redux/store'
 import { InlineDataPart } from '@google/generative-ai';
 import { useSession } from 'next-auth/react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import React, { useTransition } from 'react'
 
-const ChatForm = ({ vision }: { vision?: boolean }) => {
+const ChatForm = () => {
+    const pathname = usePathname();
+    const vision = pathname.startsWith('/vision');
 
     const dispatch = useAppDispatch();
     const [isPending, startTransition] = useTransition();
@@ -102,8 +104,8 @@ const ChatForm = ({ vision }: { vision?: boolean }) => {
     }
 
     return (
-        <div className="w-full m-2 md:pt-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:w-[calc(100%-.5rem)]">
-            <div className="stretch mx-2 flex flex-row gap-3  md:mx-4 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
+        <div className="w-full md:pt-0 dark:border-white/20 md:border-transparent md:dark:border-transparent">
+            <div className="stretch">
                 <form ref={formRef} className="flex justify-between w-full gap-1 items-end" onSubmit={sendData}>
                     <div className="w-full border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                         <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800 relative">

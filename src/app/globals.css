@@ -29,6 +29,9 @@ body {
   /* .scrollbar::-webkit-scrollbar-thumb:hover {
       background: #0e0f2e;
   } */
+  .no-tailwindcss {
+    @apply break-words
+  }
 }
 
 

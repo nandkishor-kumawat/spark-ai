@@ -9,12 +9,12 @@ import Sidebar from './sidebar';
 
 const Navbar = () => {
     return (
-        <div className="border-b border-b-zinc-800 w-full p-2 flex items-center">
+        <div className="border-b border-b-zinc-800 w-full p-2 flex items-center h-10">
             <Sheet>
                 <SheetTrigger className='p-2 block md:hidden'>
                     <RiMenu4Line className='w-5 h-5' />
                 </SheetTrigger>
-                <SheetContent side={'left'} className='w-[300px]'>
+                <SheetContent side={'left'} className='w-[300px] p-2'>
                     {/* <SheetHeader>
                         <SheetTitle>Are you absolutely sure?</SheetTitle>
                         <SheetDescription>

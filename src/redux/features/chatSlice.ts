@@ -1,37 +1,44 @@
-import { QueryType } from "@/lib/types";
+import { Message } from "@prisma/client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ChatState {
-    chats: QueryType[]
+    chats: Message[]
+    prompt: string,
 }
 
 const initialState = {
-    chats: []
+    chats: [],
+    prompt: "",
 } as ChatState
 
 export const chat = createSlice({
     name: "chat",
     initialState,
     reducers: {
-        initializeChats: (state, action: PayloadAction<QueryType[]>) => {
+        initializeChats: (state, action: PayloadAction<Message[]>) => {
             state.chats = action.payload
         },
 
-        addUserChat: (state, action: PayloadAction<QueryType>) => {
+        addUserChat: (state, action: PayloadAction<Message>) => {
             state.chats.push(action.payload);
         },
 
-        addModelChat: (state, action: PayloadAction<QueryType>) => {
+        addModelChat: (state, action: PayloadAction<Message>) => {
             state.chats.pop();
             state.chats.push(action.payload);
-        }
+        },
+
+        setPrompt: (state, action: PayloadAction<string>) => {
+            state.prompt = action.payload;
+        },
     },
 });
 
 export const {
     addUserChat,
     addModelChat,
-    initializeChats
+    initializeChats,
+    setPrompt,
 } = chat.actions;
 
 export default chat.reducer;

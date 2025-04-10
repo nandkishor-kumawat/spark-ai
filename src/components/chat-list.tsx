@@ -1,43 +1,81 @@
 "use client"
-import { initializeChats } from '@/redux/features/chatSlice';
-import { store, useAppSelector } from '@/redux/store'
-import React, { useEffect, useLayoutEffect, useRef } from 'react'
-import Chat from './Chat';
+import React from 'react'
+import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
+import { ChatRequestOptions, Message } from 'ai';
+import { MessagePreview, ThinkingMessage } from './message-preview';
+import { useSession } from 'next-auth/react';
+import equal from 'fast-deep-equal';
 
-function ChatList({ history }: { history: any[] }) {
-    const chats = useAppSelector((state) => state.chat.chats);
-    const ref = useRef<HTMLDivElement>(null);
+interface MessagesProps {
+    chatId: string;
+    isLoading: boolean;
+    messages: Array<Message>;
+    setMessages: (
+        messages: Message[] | ((messages: Message[]) => Message[]),
+    ) => void;
+    reload: (
+        chatRequestOptions?: ChatRequestOptions,
+    ) => Promise<string | null | undefined>;
+}
 
-    useLayoutEffect(() => {
-        store.dispatch(initializeChats(history));
-    }, [history]);
 
-    useEffect(() => {
-        ref.current!.scrollIntoView({ behavior: 'smooth' });
-        ref.current!.scrollIntoView();
-    }, [chats])
+function ChatList({
+    chatId,
+    isLoading,
+    messages,
+    setMessages,
+    reload,
+}: MessagesProps) {
+
+    const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
+
+    const { data } = useSession();
 
     return (
-        <>
-            {chats.length === 0 && (
-                <div className="w-full h-full flex justify-center items-center" style={{
-                    marginTop: '50%',
-                    transform: 'translateY(-50%)'
-                }}>
-                    <h1 className="text-3xl font-bold">No Chats Found</h1>
+        <div
+            ref={messagesContainerRef}
+            className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-auto pt-4 scrollbar"
+        >
+            {messages.length === 0 && (
+                <div className="h-full w-full flex items-center justify-center">
+                    <div className="max-w-md text-center space-y-4 m-auto">
+                        <h1 className="md:text-3xl text-xl">Welcome!</h1>
+                        <p className="text-lg text-zinc-400"> How can I assist you today?</p>
+                    </div>
                 </div>
             )}
 
-            <div className="w-full">
-                {
-                    chats.map((chat, i) => (
-                        <Chat key={i} chat={chat} isLast={(i === chats.length - 1)} />
-                    ))
-                }
-            </div>
-            <div ref={ref}></div>
-        </>
+            {messages.map((message, i) => (
+                <MessagePreview
+                    key={message.id}
+                    message={message}
+                    isLoading={isLoading && messages.length - 1 === i}
+                    chatId={chatId}
+                    setMessages={setMessages}
+                    reload={reload}
+                    isReadonly={false}
+                />
+            ))}
+            {isLoading &&
+                messages.length > 0 &&
+                messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+
+            <div
+                ref={messagesEndRef}
+                className="shrink-0 min-w-[24px] min-h-[24px]"
+            />
+        </div>
     )
 }
 
-export default ChatList
+
+export const Messages = React.memo(ChatList, (prevProps, nextProps) => {
+
+    if (prevProps.isLoading !== nextProps.isLoading) return false;
+    if (prevProps.isLoading && nextProps.isLoading) return false;
+    if (prevProps.messages.length !== nextProps.messages.length) return false;
+    if (!equal(prevProps.messages, nextProps.messages)) return false;
+
+    return true;
+});
+

@@ -11,7 +11,7 @@ export const options: NextAuthOptions = {
                         email: profile.email
                     }
                 });
-                if(user) return user as DefaultUser;
+                if (user) return user as DefaultUser;
                 else {
                     return await prisma.user.create({
                         data: {

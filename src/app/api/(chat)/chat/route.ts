@@ -3,7 +3,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import prisma from '@/prisma';
 import { auth } from '@/auth';
 import { MODELS } from '@/lib/constants';
-import { getChatById } from '@/actions/ai.actions';
+import { deleteChat, getChatById, saveMessages } from '@/actions/ai.actions';
 
 const google = createGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -20,6 +20,8 @@ const generateTitle = async (prompt: string) => {
       - you will generate a short title based on the first message a user begins a conversation with
       - ensure it is not more than 80 characters long
       - the title should be a summary of the user's message
+      - Be specific and context-aware
+      - Avoid vague or generic phrases
       - do not use quotes or colons`,
         prompt
     });
@@ -40,11 +42,8 @@ export const POST = async (req: Request) => {
         return new Response('No user message found', { status: 400 });
     }
 
-    const chat = await prisma.chat.findFirst({
-        where: {
-            id: chatId,
-        },
-    });
+    const chat = await getChatById(chatId);
+
     if (!chat) {
         //start new chat
         const title = await generateTitle(prompt);
@@ -57,29 +56,24 @@ export const POST = async (req: Request) => {
         })
     }
 
-    //save message
-    await prisma.message.create({
-        data: {
-            chatId: chatId,
-            content: prompt,
-            role: 'user',
-        }
-    })
+    await saveMessages([{ chatId: chatId, content: prompt.trim(), role: 'user' }])
 
     try {
         const result = streamText({
             model,
-            system: 'You are Argo, a virtual assistant for farmers, trained and designed by Nandkishor Kumawat(https://github.com/nandkishor-kumawat) and Rajkumar Nagar(https://github.com/Rajkumar-Nagar). You have been trained to help farmers with their queries. You can provide information on weather, crop prices, crop diseases. Provide the best possible answers to the user queries.',
+            system: `
+You are an intelligent, efficient, and professional AI assistant named "Spark AI" built by Nandkishor Kumawat. Your goal is to understand the user's intent and provide clear, accurate, and context-aware responses.
+
+Guidelines:
+- Adapt your tone based on the user's style (formal, casual, technical).
+- Prioritize usefulness, clarity, and brevity.
+- Use bullet points, headings, or code blocks to improve readability.
+- Ask clarifying questions when needed.
+- Do not fabricate information. Be honest if unsure or if more context is needed.
+`,
             messages,
-            async onFinish({ text, usage, finishReason, response }) {
-                //save response
-                await prisma.message.create({
-                    data: {
-                        chatId: chatId,
-                        content: text,
-                        role: 'assistant',
-                    }
-                })
+            async onFinish({ text }) {
+                await saveMessages([{ chatId: chatId, content: text, role: 'assistant', }]);
             },
         });
         return result.toDataStreamResponse();
@@ -107,11 +101,8 @@ export const DELETE = async (req: Request) => {
             return new Response('Unauthorized', { status: 401 });
         }
 
-        const deletedChat = await prisma.chat.delete({
-            where: {
-                id
-            }
-        })
+        const deletedChat = await deleteChat(id);
+
         if (!deletedChat) {
             return new Response('Chat not found', { status: 404 });
         }

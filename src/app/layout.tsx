@@ -24,7 +24,7 @@ export default function RootLayout({
         <Provider>
           <body className={inter.className}>
             <NextTopLoader showSpinner={false} shadow={false} />
-            <Toaster position="top-center" />
+            <Toaster position="top-right" />
             {children}
           </body>
         </Provider>

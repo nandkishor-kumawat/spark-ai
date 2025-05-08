@@ -1,3 +1,22 @@
+// import { useEffect, useRef, type RefObject } from 'react';
+
+// export function useScrollToBottom<T extends HTMLElement>(
+//     deps: any[] = []
+// ): [RefObject<T>, RefObject<T>] {
+//     const containerRef = useRef<T>(null);
+//     const endRef = useRef<T>(null);
+
+//     useEffect(() => {
+//         const end = endRef.current;
+//         if (end) {
+//             end.scrollIntoView({ behavior: 'instant', block: 'end' });
+//         }
+//     }, deps);
+
+//     return [containerRef, endRef];
+// }
+
+
 import { useEffect, useRef, type RefObject } from 'react';
 
 export function useScrollToBottom<T extends HTMLElement>(): [

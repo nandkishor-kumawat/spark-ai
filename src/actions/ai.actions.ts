@@ -1,32 +1,24 @@
 "use server"
 
 import prisma from "@/prisma";
+import { Prisma } from "@/prisma/client";
 
 export const getChatsByUserId = async (userId: string) => {
-    const chats = await prisma.chat.findMany({
-        where: {
-            userId
-        },
-        orderBy: {
-            createdAt: 'desc'
-        },
+    return prisma.chat.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        omit: { mongo_id: true }
     })
-
-    return chats;
 }
-export const getChatById = async (id: string) => {
-    const chat = await prisma.chat.findFirst({ where: { id } })
-    return chat;
-}
+export const getChatById = async (id: string) => prisma.chat.findFirst({ where: { id } })
 
 export const getMessagesByChatId = async (chatId: string) => {
-    const messages = await prisma.message.findMany({
-        where: {
-            chatId
-        },
-        orderBy: {
-            createdAt: 'asc'
-        },
+    return prisma.message.findMany({
+        where: { chatId },
+        orderBy: { createdAt: 'asc' },
     })
-    return messages;
 }
+
+export const saveMessages = async (messages: Prisma.MessageCreateManyInput[]) => prisma.message.createMany({ data: messages })
+
+export const deleteChat = async (id: string) => prisma.chat.delete({ where: { id } })

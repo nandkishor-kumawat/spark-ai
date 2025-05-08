@@ -1,4 +1,4 @@
-import { Message } from "@prisma/client";
+import { Message } from "@/prisma/client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ChatState {

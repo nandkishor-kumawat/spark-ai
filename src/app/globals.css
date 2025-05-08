@@ -9,9 +9,19 @@ body {
 }
 
 @layer utilities {
+  .scrollbar-h ::-webkit-scrollbar {
+    height: 7px;
+  }
+  .scrollbar-h ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  .scrollbar-h ::-webkit-scrollbar-thumb {
+    background: rgb(56, 56, 56);
+    border-radius: 100vh;
+  }
+
   .scrollbar::-webkit-scrollbar {
     width: 5px;
-    /* height: 20px; */
   }
 
   .scrollbar::-webkit-scrollbar-track {

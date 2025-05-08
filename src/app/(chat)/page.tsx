@@ -1,4 +1,4 @@
-import Chat from '@/components/chat';
+import Chat from '@/app/(chat)/components/chat';
 import { generateUUID } from '@/lib/utils'
 import React from 'react'
 

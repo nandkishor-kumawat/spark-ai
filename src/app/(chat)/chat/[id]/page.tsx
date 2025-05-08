@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import Chat from '@/components/chat'
+import Chat from '@/app/(chat)/components/chat'
 import prisma from '@/prisma';
 import { notFound } from 'next/navigation';
 import React from 'react'
@@ -7,9 +7,9 @@ import React from 'react'
 const Page = async ({
     params,
 }: {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }) => {
-    const { id } = params;
+    const { id } = await params;
 
     const chat = await prisma.chat.findFirst({
         where: {

@@ -1,8 +1,12 @@
 "use client"
-import { useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import AutoHeightTextarea from '@/components/auto-height-textarea';
 import { Button } from '@/components/ui/button';
-import { ArrowUpIcon, Loader2, Square, } from 'lucide-react';
+import { ArrowUpIcon, Loader2, PaperclipIcon, Square } from 'lucide-react';
+import { useChat } from '@ai-sdk/react';
+import { toast } from 'sonner';
+import { Attachment } from 'ai';
+import AttachmentPreview from './attachment-preview';
 
 interface ChatFormProps {
     chatId: string;
@@ -10,7 +14,7 @@ interface ChatFormProps {
     setInput: (value: string) => void;
     isLoading: boolean;
     stop: () => void;
-    handleSubmit: () => void;
+    handleSubmit: ReturnType<typeof useChat>['handleSubmit'];
 }
 
 export default function ChatForm({
@@ -22,38 +26,181 @@ export default function ChatForm({
     handleSubmit,
 }: ChatFormProps) {
 
+    const [attachments, setAttachments] = useState<Attachment[]>([])
+    const [uploadQueue, setUploadQueue] = useState<File[]>([]);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const uploadFile = async (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/files/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const { url, pathname, contentType } = data;
+                console.log(data)
+                return {
+                    url,
+                    name: pathname,
+                    contentType
+                };
+            }
+            const { error } = await response.json();
+            toast.error(error);
+        } catch (error) {
+            toast.error('Failed to upload file, please try again!');
+        }
+    };
+
+
+    const handleUploadFiles = useCallback(async (files: File[]) => {
+        setUploadQueue(prev => [...prev, ...files]);
+        try {
+            const validFiles = files.filter(file => {
+                if (file.size <= 5 * 1024 * 1024 && file.type.startsWith('image/')) {
+                    return true;
+                } else {
+                    toast.error('Max size: 5MB');
+                    return false;
+                }
+            });
+            if (validFiles.length === 0) return;
+            const uploadPromises = validFiles.map(uploadFile);
+            const uploadResults = await Promise.all(uploadPromises);
+            const successfulUploads = uploadResults.filter(result => result !== undefined);
+            setAttachments(prev => [...prev, ...successfulUploads])
+        } catch (error) {
+            toast.error('Failed to process files, please try again!');
+        } finally {
+            setUploadQueue([])
+        }
+    }, [setUploadQueue, setAttachments]);
+
+
+    const handlePaste = useCallback(async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+        const items = Array.from(e.clipboardData?.items || []);
+        const files = [] as File[];
+
+        items.forEach((item) => {
+            if (item.kind === 'file') {
+                if (item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    if (file) {
+                        files.push(file);
+                    }
+                } else {
+                    toast.error('Only images are allowed');
+                    e.preventDefault();
+                }
+            }
+        });
+        if (files.length === 0) return
+        e.preventDefault();
+        await handleUploadFiles(files);
+    }, [handleUploadFiles]);
+
+
+    const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+        await handleUploadFiles(files)
+        e.target.value = '';
+    }, [handleUploadFiles]);
+
+
     const submitForm = useCallback(() => {
         window.history.replaceState({}, '', `/chat/${chatId}`);
-        handleSubmit()
-    }, [handleSubmit, chatId]);
 
+        handleSubmit(undefined, {
+            experimental_attachments: attachments
+        })
+
+        setAttachments([])
+    }, [handleSubmit, chatId, attachments]);
 
 
     return (
-        <div className="relative w-full flex flex-col gap-4">
-            <AutoHeightTextarea
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="min-h-[24px] transition-all focus-visible:ring-offset-0 max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700"
-                onKeyDown={(e) => {
+        <div className="relat ive w-full flex flex-col gap-4">
 
-                    if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        if (input.trim()) submitForm()
-                    }
-                }
-                }
-            />
-            <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
-                {isLoading ? (
-                    <Loader2 className="animate-spin" size={18} />
-                ) : (
-                    <SendButton
-                        input={input}
-                        submitForm={submitForm}
-                    />
-                )}
+            {(attachments.length > 0 || uploadQueue.length > 0) && (
+                <div className="flex flex-row gap-2 overflow-x-auto items-end">
+                    {attachments.map((attachment) => (
+                        <AttachmentPreview
+                            key={attachment.url}
+                            attachment={attachment}
+                            handleDelete={() => setAttachments((prev) => prev.filter((a) => a.url !== attachment.url))}
+                        />
+                    ))}
+
+                    {uploadQueue.map((file) => (
+                        <AttachmentPreview
+                            key={file.name}
+                            attachment={{
+                                url: URL.createObjectURL(file),
+                                name: file.name,
+                                contentType: file.type || 'image/png',
+                            }}
+                            isUploading={true}
+                        />
+                    ))}
+                </div>
+            )}
+
+
+            <div className="flex flex-col pt-2 transition-all focus-within:ring-ring focus-within:ring-2 rounded-2xl bg-muted dark:border-zinc-700">
+                <AutoHeightTextarea
+                    placeholder="Type your message..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onPaste={handlePaste}
+                    className="min-h-[24px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none max-h-[calc(30dvh)] scrollbar-none resize-none rounded-2xl !text-base bg-muted"
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            if (input.trim()) submitForm()
+                        }
+                    }}
+                />
+
+                <div className="relative flex items-center justify-between">
+                    <div className="p-2 w-fit flex flex-row justify-start">
+                        <input
+                            type="file"
+                            className="hidden"
+                            ref={fileInputRef}
+                            accept='image/*'
+                            onChange={handleFileChange}
+                            tabIndex={-1}
+                            multiple
+                            disabled={uploadQueue.length !== 0}
+                        />
+                        <Button
+                            type="button"
+                            variant={'ghost'}
+                            className="rounded-full p-1.5 h-fit"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <PaperclipIcon size={14} />
+                        </Button>
+                    </div>
+
+                    <div className="p-2 w-fit flex flex-row justify-end">
+                        {isLoading ? (
+                            <Loader2 className="animate-spin" size={18} />
+                        ) : (
+                            <SendButton
+                                handleSubmit={submitForm}
+                                disabled={!input.trim() || uploadQueue.length !== 0}
+                            />
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -61,17 +208,17 @@ export default function ChatForm({
 
 
 const SendButton = ({
-    input,
-    submitForm,
+    handleSubmit,
+    disabled,
 }: {
-    input: string;
-    submitForm: () => void;
+    handleSubmit: () => void;
+    disabled?: boolean;
 }) => {
     return (
         <Button
             type="button"
-            disabled={!input.trim()}
-            onClick={submitForm}
+            disabled={disabled}
+            onClick={handleSubmit}
             className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
         >
             <ArrowUpIcon size={14} />

@@ -12,16 +12,8 @@ const Page = async ({
     const { id } = await params;
 
     const chat = await prisma.chat.findFirst({
-        where: {
-            id: id
-        },
-        include: {
-            messages: {
-                orderBy: {
-                    createdAt: 'asc'
-                },
-            }
-        }
+        where: { id },
+        include: { messages: { orderBy: { createdAt: 'asc' } } }
     })
 
     if (!chat) notFound();
@@ -36,6 +28,7 @@ const Page = async ({
         content: message.content,
         role: message.role as 'user' | 'assistant',
         createdAt: message.createdAt,
+        experimental_attachments: message.attachments
     }))
 
     return (

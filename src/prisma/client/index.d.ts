@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model Attachment
+ * 
+ */
+export type Attachment = $Result.DefaultSelection<Prisma.$AttachmentPayload>
+/**
  * Model User
  * 
  */
@@ -1084,6 +1089,73 @@ export namespace Prisma {
    */
 
   /**
+   * Model Attachment
+   */
+
+
+
+
+
+  export type AttachmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    url?: boolean
+    name?: boolean
+    contentType?: boolean
+  }, ExtArgs["result"]["attachment"]>
+
+
+
+  export type AttachmentSelectScalar = {
+    url?: boolean
+    name?: boolean
+    contentType?: boolean
+  }
+
+  export type AttachmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"url" | "name" | "contentType", ExtArgs["result"]["attachment"]>
+
+  export type $AttachmentPayload = {
+    name: "Attachment"
+    objects: {}
+    scalars: {
+      url: string
+      name: string
+      contentType: string
+    }
+    composites: {}
+  }
+
+  type AttachmentGetPayload<S extends boolean | null | undefined | AttachmentDefaultArgs> = $Result.GetResult<Prisma.$AttachmentPayload, S>
+
+
+
+
+
+  /**
+   * Fields of the Attachment model
+   */
+  interface AttachmentFieldRefs {
+    readonly url: FieldRef<"Attachment", 'String'>
+    readonly name: FieldRef<"Attachment", 'String'>
+    readonly contentType: FieldRef<"Attachment", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Attachment without action
+   */
+  export type AttachmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Attachment
+     */
+    select?: AttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Attachment
+     */
+    omit?: AttachmentOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model User
    */
 
@@ -2127,6 +2199,7 @@ export namespace Prisma {
     userId: string | null
     visibility: $Enums.Visibility | null
     createdAt: Date | null
+    systemPrompt: string | null
     updatedAt: Date | null
   }
 
@@ -2137,6 +2210,7 @@ export namespace Prisma {
     userId: string | null
     visibility: $Enums.Visibility | null
     createdAt: Date | null
+    systemPrompt: string | null
     updatedAt: Date | null
   }
 
@@ -2147,6 +2221,7 @@ export namespace Prisma {
     userId: number
     visibility: number
     createdAt: number
+    systemPrompt: number
     updatedAt: number
     _all: number
   }
@@ -2159,6 +2234,7 @@ export namespace Prisma {
     userId?: true
     visibility?: true
     createdAt?: true
+    systemPrompt?: true
     updatedAt?: true
   }
 
@@ -2169,6 +2245,7 @@ export namespace Prisma {
     userId?: true
     visibility?: true
     createdAt?: true
+    systemPrompt?: true
     updatedAt?: true
   }
 
@@ -2179,6 +2256,7 @@ export namespace Prisma {
     userId?: true
     visibility?: true
     createdAt?: true
+    systemPrompt?: true
     updatedAt?: true
     _all?: true
   }
@@ -2262,6 +2340,7 @@ export namespace Prisma {
     userId: string
     visibility: $Enums.Visibility
     createdAt: Date
+    systemPrompt: string | null
     updatedAt: Date
     _count: ChatCountAggregateOutputType | null
     _min: ChatMinAggregateOutputType | null
@@ -2289,6 +2368,7 @@ export namespace Prisma {
     userId?: boolean
     visibility?: boolean
     createdAt?: boolean
+    systemPrompt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     messages?: boolean | Chat$messagesArgs<ExtArgs>
@@ -2304,10 +2384,11 @@ export namespace Prisma {
     userId?: boolean
     visibility?: boolean
     createdAt?: boolean
+    systemPrompt?: boolean
     updatedAt?: boolean
   }
 
-  export type ChatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"mongo_id" | "id" | "title" | "userId" | "visibility" | "createdAt" | "updatedAt", ExtArgs["result"]["chat"]>
+  export type ChatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"mongo_id" | "id" | "title" | "userId" | "visibility" | "createdAt" | "systemPrompt" | "updatedAt", ExtArgs["result"]["chat"]>
   export type ChatInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     messages?: boolean | Chat$messagesArgs<ExtArgs>
@@ -2327,6 +2408,7 @@ export namespace Prisma {
       userId: string
       visibility: $Enums.Visibility
       createdAt: Date
+      systemPrompt: string | null
       updatedAt: Date
     }, ExtArgs["result"]["chat"]>
     composites: {}
@@ -2728,6 +2810,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"Chat", 'String'>
     readonly visibility: FieldRef<"Chat", 'Visibility'>
     readonly createdAt: FieldRef<"Chat", 'DateTime'>
+    readonly systemPrompt: FieldRef<"Chat", 'String'>
     readonly updatedAt: FieldRef<"Chat", 'DateTime'>
   }
     
@@ -3311,6 +3394,7 @@ export namespace Prisma {
     chatId?: boolean
     role?: boolean
     content?: boolean
+    attachments?: boolean | AttachmentDefaultArgs<ExtArgs>
     createdAt?: boolean
     updatedAt?: boolean
     chat?: boolean | ChatDefaultArgs<ExtArgs>
@@ -3327,7 +3411,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "chatId" | "role" | "content" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "chatId" | "role" | "content" | "attachments" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     chat?: boolean | ChatDefaultArgs<ExtArgs>
   }
@@ -3345,7 +3429,9 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["message"]>
-    composites: {}
+    composites: {
+      attachments: Prisma.$AttachmentPayload[]
+    }
   }
 
   type MessageGetPayload<S extends boolean | null | undefined | MessageDefaultArgs> = $Result.GetResult<Prisma.$MessagePayload, S>
@@ -4155,6 +4241,7 @@ export namespace Prisma {
     userId: 'userId',
     visibility: 'visibility',
     createdAt: 'createdAt',
+    systemPrompt: 'systemPrompt',
     updatedAt: 'updatedAt'
   };
 
@@ -4328,6 +4415,7 @@ export namespace Prisma {
     userId?: StringFilter<"Chat"> | string
     visibility?: EnumVisibilityFilter<"Chat"> | $Enums.Visibility
     createdAt?: DateTimeFilter<"Chat"> | Date | string
+    systemPrompt?: StringNullableFilter<"Chat"> | string | null
     updatedAt?: DateTimeFilter<"Chat"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     messages?: MessageListRelationFilter
@@ -4340,6 +4428,7 @@ export namespace Prisma {
     userId?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
+    systemPrompt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
     messages?: MessageOrderByRelationAggregateInput
@@ -4355,6 +4444,7 @@ export namespace Prisma {
     userId?: StringFilter<"Chat"> | string
     visibility?: EnumVisibilityFilter<"Chat"> | $Enums.Visibility
     createdAt?: DateTimeFilter<"Chat"> | Date | string
+    systemPrompt?: StringNullableFilter<"Chat"> | string | null
     updatedAt?: DateTimeFilter<"Chat"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     messages?: MessageListRelationFilter
@@ -4367,6 +4457,7 @@ export namespace Prisma {
     userId?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
+    systemPrompt?: SortOrder
     updatedAt?: SortOrder
     _count?: ChatCountOrderByAggregateInput
     _max?: ChatMaxOrderByAggregateInput
@@ -4383,6 +4474,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Chat"> | string
     visibility?: EnumVisibilityWithAggregatesFilter<"Chat"> | $Enums.Visibility
     createdAt?: DateTimeWithAggregatesFilter<"Chat"> | Date | string
+    systemPrompt?: StringNullableWithAggregatesFilter<"Chat"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"Chat"> | Date | string
   }
 
@@ -4394,6 +4486,7 @@ export namespace Prisma {
     chatId?: StringFilter<"Message"> | string
     role?: StringFilter<"Message"> | string
     content?: StringFilter<"Message"> | string
+    attachments?: AttachmentCompositeListFilter | AttachmentObjectEqualityInput[]
     createdAt?: DateTimeFilter<"Message"> | Date | string
     updatedAt?: DateTimeFilter<"Message"> | Date | string
     chat?: XOR<ChatScalarRelationFilter, ChatWhereInput>
@@ -4404,6 +4497,7 @@ export namespace Prisma {
     chatId?: SortOrder
     role?: SortOrder
     content?: SortOrder
+    attachments?: AttachmentOrderByCompositeAggregateInput
     createdAt?: SortOrder
     updatedAt?: SortOrder
     chat?: ChatOrderByWithRelationInput
@@ -4417,6 +4511,7 @@ export namespace Prisma {
     chatId?: StringFilter<"Message"> | string
     role?: StringFilter<"Message"> | string
     content?: StringFilter<"Message"> | string
+    attachments?: AttachmentCompositeListFilter | AttachmentObjectEqualityInput[]
     createdAt?: DateTimeFilter<"Message"> | Date | string
     updatedAt?: DateTimeFilter<"Message"> | Date | string
     chat?: XOR<ChatScalarRelationFilter, ChatWhereInput>
@@ -4522,6 +4617,7 @@ export namespace Prisma {
     title: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutChatsInput
     messages?: MessageCreateNestedManyWithoutChatInput
@@ -4534,6 +4630,7 @@ export namespace Prisma {
     userId: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
     messages?: MessageUncheckedCreateNestedManyWithoutChatInput
   }
@@ -4543,6 +4640,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutChatsNestedInput
     messages?: MessageUpdateManyWithoutChatNestedInput
@@ -4554,6 +4652,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUncheckedUpdateManyWithoutChatNestedInput
   }
@@ -4565,6 +4664,7 @@ export namespace Prisma {
     userId: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
   }
 
@@ -4573,6 +4673,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -4582,6 +4683,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -4589,6 +4691,7 @@ export namespace Prisma {
     id?: string
     role: string
     content: string
+    attachments?: XOR<AttachmentListCreateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: Date | string
     updatedAt?: Date | string
     chat: ChatCreateNestedOneWithoutMessagesInput
@@ -4599,6 +4702,7 @@ export namespace Prisma {
     chatId: string
     role: string
     content: string
+    attachments?: XOR<AttachmentListCreateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -4606,6 +4710,7 @@ export namespace Prisma {
   export type MessageUpdateInput = {
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chat?: ChatUpdateOneRequiredWithoutMessagesNestedInput
@@ -4615,6 +4720,7 @@ export namespace Prisma {
     chatId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4624,6 +4730,7 @@ export namespace Prisma {
     chatId: string
     role: string
     content: string
+    attachments?: XOR<AttachmentListCreateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -4631,6 +4738,7 @@ export namespace Prisma {
   export type MessageUpdateManyMutationInput = {
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4639,6 +4747,7 @@ export namespace Prisma {
     chatId?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4805,6 +4914,7 @@ export namespace Prisma {
     userId?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
+    systemPrompt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -4815,6 +4925,7 @@ export namespace Prisma {
     userId?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
+    systemPrompt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -4825,6 +4936,7 @@ export namespace Prisma {
     userId?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
+    systemPrompt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -4838,9 +4950,28 @@ export namespace Prisma {
     _max?: NestedEnumVisibilityFilter<$PrismaModel>
   }
 
+  export type AttachmentCompositeListFilter = {
+    equals?: AttachmentObjectEqualityInput[]
+    every?: AttachmentWhereInput
+    some?: AttachmentWhereInput
+    none?: AttachmentWhereInput
+    isEmpty?: boolean
+    isSet?: boolean
+  }
+
+  export type AttachmentObjectEqualityInput = {
+    url: string
+    name: string
+    contentType: string
+  }
+
   export type ChatScalarRelationFilter = {
     is?: ChatWhereInput
     isNot?: ChatWhereInput
+  }
+
+  export type AttachmentOrderByCompositeAggregateInput = {
+    _count?: SortOrder
   }
 
   export type MessageCountOrderByAggregateInput = {
@@ -4985,10 +5116,27 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
+  export type AttachmentListCreateEnvelopeInput = {
+    set?: AttachmentCreateInput | AttachmentCreateInput[]
+  }
+
+  export type AttachmentCreateInput = {
+    url: string
+    name: string
+    contentType: string
+  }
+
   export type ChatCreateNestedOneWithoutMessagesInput = {
     create?: XOR<ChatCreateWithoutMessagesInput, ChatUncheckedCreateWithoutMessagesInput>
     connectOrCreate?: ChatCreateOrConnectWithoutMessagesInput
     connect?: ChatWhereUniqueInput
+  }
+
+  export type AttachmentListUpdateEnvelopeInput = {
+    set?: AttachmentCreateInput | AttachmentCreateInput[]
+    push?: AttachmentCreateInput | AttachmentCreateInput[]
+    updateMany?: AttachmentUpdateManyInput
+    deleteMany?: AttachmentDeleteManyInput
   }
 
   export type ChatUpdateOneRequiredWithoutMessagesNestedInput = {
@@ -5128,12 +5276,22 @@ export namespace Prisma {
     _max?: NestedEnumVisibilityFilter<$PrismaModel>
   }
 
+  export type AttachmentWhereInput = {
+    AND?: AttachmentWhereInput | AttachmentWhereInput[]
+    OR?: AttachmentWhereInput[]
+    NOT?: AttachmentWhereInput | AttachmentWhereInput[]
+    url?: StringFilter<"Attachment"> | string
+    name?: StringFilter<"Attachment"> | string
+    contentType?: StringFilter<"Attachment"> | string
+  }
+
   export type ChatCreateWithoutUserInput = {
     mongo_id?: string
     id: string
     title: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutChatInput
   }
@@ -5144,6 +5302,7 @@ export namespace Prisma {
     title: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
     messages?: MessageUncheckedCreateNestedManyWithoutChatInput
   }
@@ -5183,6 +5342,7 @@ export namespace Prisma {
     userId?: StringFilter<"Chat"> | string
     visibility?: EnumVisibilityFilter<"Chat"> | $Enums.Visibility
     createdAt?: DateTimeFilter<"Chat"> | Date | string
+    systemPrompt?: StringNullableFilter<"Chat"> | string | null
     updatedAt?: DateTimeFilter<"Chat"> | Date | string
   }
 
@@ -5215,6 +5375,7 @@ export namespace Prisma {
     id?: string
     role: string
     content: string
+    attachments?: XOR<AttachmentListCreateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5223,6 +5384,7 @@ export namespace Prisma {
     id?: string
     role: string
     content: string
+    attachments?: XOR<AttachmentListCreateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5299,6 +5461,7 @@ export namespace Prisma {
     title: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutChatsInput
   }
@@ -5310,12 +5473,22 @@ export namespace Prisma {
     userId: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
   }
 
   export type ChatCreateOrConnectWithoutMessagesInput = {
     where: ChatWhereUniqueInput
     create: XOR<ChatCreateWithoutMessagesInput, ChatUncheckedCreateWithoutMessagesInput>
+  }
+
+  export type AttachmentUpdateManyInput = {
+    where: AttachmentWhereInput
+    data: AttachmentUpdateInput
+  }
+
+  export type AttachmentDeleteManyInput = {
+    where: AttachmentWhereInput
   }
 
   export type ChatUpsertWithoutMessagesInput = {
@@ -5334,6 +5507,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutChatsNestedInput
   }
@@ -5344,6 +5518,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5353,6 +5528,7 @@ export namespace Prisma {
     title: string
     visibility?: $Enums.Visibility
     createdAt?: Date | string
+    systemPrompt?: string | null
     updatedAt?: Date | string
   }
 
@@ -5361,6 +5537,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutChatNestedInput
   }
@@ -5370,6 +5547,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUncheckedUpdateManyWithoutChatNestedInput
   }
@@ -5379,6 +5557,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     visibility?: EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    systemPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5386,6 +5565,7 @@ export namespace Prisma {
     id?: string
     role: string
     content: string
+    attachments?: XOR<AttachmentListCreateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -5393,6 +5573,7 @@ export namespace Prisma {
   export type MessageUpdateWithoutChatInput = {
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5400,6 +5581,7 @@ export namespace Prisma {
   export type MessageUncheckedUpdateWithoutChatInput = {
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5407,8 +5589,15 @@ export namespace Prisma {
   export type MessageUncheckedUpdateManyWithoutChatInput = {
     role?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    attachments?: XOR<AttachmentListUpdateEnvelopeInput, AttachmentCreateInput> | AttachmentCreateInput[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttachmentUpdateInput = {
+    url?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
   }
 
 

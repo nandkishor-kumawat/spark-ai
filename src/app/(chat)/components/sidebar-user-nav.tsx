@@ -30,10 +30,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { User } from "next-auth"
+import { useRouter } from "next/navigation"
 
 const SidebarUserNav = ({ user }: { user: User }) => {
   const { isMobile } = useSidebar();
-
+  const router = useRouter();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -95,7 +96,9 @@ const SidebarUserNav = ({ user }: { user: User }) => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => router.push('/api/auth/signout')}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

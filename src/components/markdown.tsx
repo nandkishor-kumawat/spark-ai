@@ -139,6 +139,13 @@ const components: Partial<Components> = {
             </h6>
         );
     },
+    p: ({ node, children, ...props }) => {
+        return (
+            <p className="text-justify" {...props}>
+                {children}
+            </p>
+        );
+    },
 };
 
 const remarkPlugins = [remarkGfm];
@@ -171,7 +178,7 @@ export const NonMemoizedMarkdown1 = ({ children }: { children: string }) => {
                         if ((node.children[0] as any).tagName === "code" && (node.children[1] as any).properties.class == "copied") {
                             const code = node.children[0] as any
                             const copied = node.children[1]
-                            const language = code.properties.className[0].split("-")[1]
+                            const language = code?.properties?.className?.[0]?.split("-")[1]
                             node.properties.className = "group/copy "
 
 
@@ -241,4 +248,4 @@ export const NonMemoizedMarkdown1 = ({ children }: { children: string }) => {
 export const Markdown11 = memo(NonMemoizedMarkdown, (prevProps, nextProps) => prevProps.children === nextProps.children,);
 export const Markdown1 = memo(NonMemoizedMarkdown1, (prevProps, nextProps) => prevProps.children === nextProps.children,);
 
-export const Markdown = Markdown1
+export const Markdown = Markdown11

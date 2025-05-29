@@ -9,7 +9,7 @@ const AutoHeightTextarea = ({ value, onChange, placeholder, ...props }: React.Te
     useEffect(() => {
         const textarea = textareaRef.current!;
         textarea.style.height = 'auto';
-        textarea.style.height = `${Math.min(textarea.scrollHeight, 140)}px`;
+        textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
     }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

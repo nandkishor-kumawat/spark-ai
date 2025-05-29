@@ -7,6 +7,7 @@ import { memo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { SparkleIcon, SparklesIcon } from 'lucide-react';
 import { Markdown } from '@/components/markdown';
+import AttachmentPreview from './attachment-preview';
 
 const PurePreviewMessage = ({
     chatId,
@@ -53,6 +54,18 @@ const PurePreviewMessage = ({
                     )} */}
 
                     <div className="flex flex-col gap-4 w-full">
+
+                        {message.experimental_attachments && (
+                            <div className="flex flex-row justify-end gap-2">
+                                {message.experimental_attachments.map((attachment) => (
+                                    <AttachmentPreview
+                                        key={attachment.url}
+                                        attachment={attachment}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
 
                         {message.content && mode === 'view' && (
                             <div className="flex flex-row gap-2 items-start">

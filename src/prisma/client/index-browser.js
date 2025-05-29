@@ -127,6 +127,7 @@ exports.Prisma.ChatScalarFieldEnum = {
   userId: 'userId',
   visibility: 'visibility',
   createdAt: 'createdAt',
+  systemPrompt: 'systemPrompt',
   updatedAt: 'updatedAt'
 };
 

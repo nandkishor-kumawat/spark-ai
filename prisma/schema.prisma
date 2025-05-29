@@ -30,23 +30,31 @@ enum Visibility {
 }
 
 model Chat {
-  mongo_id   String     @id @default(auto()) @map("_id") @db.ObjectId
-  id         String     @unique
-  title      String
-  userId     String     @db.ObjectId
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  visibility Visibility @default(private)
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
-  messages   Message[]
+  mongo_id     String     @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @unique
+  title        String
+  userId       String     @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visibility   Visibility @default(private)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  systemPrompt String?    @map("system_prompt")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  messages     Message[]
+}
+
+type Attachment {
+  url         String
+  name        String
+  contentType String
 }
 
 model Message {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  chatId    String
-  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  role      String
-  content   String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  chatId      String
+  chat        Chat         @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role        String
+  content     String
+  attachments Attachment[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
 }

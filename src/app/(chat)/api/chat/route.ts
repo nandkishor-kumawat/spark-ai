@@ -36,7 +36,8 @@ export const POST = async (req: Request) => {
         return new Response('Unauthorized', { status: 401 });
     }
 
-    const prompt = messages[messages.length - 1]?.content;
+    const lastMessage = messages[messages.length - 1];
+    const prompt = lastMessage?.content
 
     if (!prompt) {
         return new Response('No user message found', { status: 400 });
@@ -56,7 +57,12 @@ export const POST = async (req: Request) => {
         })
     }
 
-    await saveMessages([{ chatId: chatId, content: prompt.trim(), role: 'user' }])
+    await saveMessages([{
+        chatId: chatId,
+        content: prompt.trim(),
+        role: 'user',
+        attachments: lastMessage.experimental_attachments
+    }]);
 
     try {
         const result = streamText({

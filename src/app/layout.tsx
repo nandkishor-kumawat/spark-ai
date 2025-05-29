@@ -24,7 +24,15 @@ export default function RootLayout({
         <Provider>
           <body className={inter.className}>
             <NextTopLoader showSpinner={false} shadow={false} />
-            <Toaster position="top-right" />
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                classNames: {
+                  error: 'bg-red-500 text-white',
+                  success: 'bg-green-500 text-white',
+                }
+              }}
+            />
             {children}
           </body>
         </Provider>

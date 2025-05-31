@@ -27,11 +27,12 @@ export default function ChatForm({
 }: ChatFormProps) {
 
     const [attachments, setAttachments] = useState<Attachment[]>([])
-    const [uploadQueue, setUploadQueue] = useState<File[]>([]);
+    const [uploadQueue, setUploadQueue] = useState<{ file: File; controller: AbortController }[]>([]);
+
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const uploadFile = async (file: File) => {
+    const uploadFile = async (file: File, signal: AbortSignal) => {
         const formData = new FormData();
         formData.append('file', file);
 
@@ -39,48 +40,55 @@ export default function ChatForm({
             const response = await fetch('/api/files/upload', {
                 method: 'POST',
                 body: formData,
+                signal,
             });
 
             if (response.ok) {
                 const data = await response.json();
-                const { url, pathname, contentType } = data;
-                console.log(data)
-                return {
-                    url,
-                    name: pathname,
-                    contentType
-                };
+                const { url, name, type } = data;
+                return { url, name, contentType: type };
             }
             const { error } = await response.json();
             toast.error(error);
         } catch (error) {
-            toast.error('Failed to upload file, please try again!');
+            if ((error as Error).name === 'AbortError') {
+                console.log('Upload cancelled');
+            } else {
+                toast.error('Failed to upload file, please try again!');
+            }
         }
     };
 
 
     const handleUploadFiles = useCallback(async (files: File[]) => {
-        setUploadQueue(prev => [...prev, ...files]);
-        try {
-            const validFiles = files.filter(file => {
-                if (file.size <= 5 * 1024 * 1024 && file.type.startsWith('image/')) {
-                    return true;
-                } else {
-                    toast.error('Max size: 5MB');
-                    return false;
-                }
-            });
-            if (validFiles.length === 0) return;
-            const uploadPromises = validFiles.map(uploadFile);
-            const uploadResults = await Promise.all(uploadPromises);
-            const successfulUploads = uploadResults.filter(result => result !== undefined);
-            setAttachments(prev => [...prev, ...successfulUploads])
-        } catch (error) {
-            toast.error('Failed to process files, please try again!');
-        } finally {
-            setUploadQueue([])
-        }
-    }, [setUploadQueue, setAttachments]);
+        const validFiles = files.filter(file => {
+            if (file.size <= 5 * 1024 * 1024 && file.type.startsWith('image/')) {
+                return true;
+            } else {
+                toast.error('Max size: 5MB');
+                return false;
+            }
+        });
+
+        if (validFiles.length === 0) return;
+
+        const uploaders = validFiles.map(async (file) => {
+            const controller = new AbortController();
+            setUploadQueue((prev) => [...prev, { file, controller }]);
+            return uploadFile(file, controller.signal)
+                .then((result) => {
+                    if (result) {
+                        setAttachments((prev) => [...prev, result]);
+                    }
+                })
+                .finally(() => {
+                    setUploadQueue((prev) => prev.filter((f) => f.file !== file));
+                });
+        });
+
+        await Promise.allSettled(uploaders);
+    }, []);
+
 
 
     const handlePaste = useCallback(async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -124,6 +132,19 @@ export default function ChatForm({
         setAttachments([])
     }, [handleSubmit, chatId, attachments]);
 
+    const handleFileDelete = useCallback(async (attachment: Attachment) => {
+        setAttachments((prev) => prev.filter((a) => a.url !== attachment.url));
+        // const res = await fetch(`/api/files/${attachment.name}`, {
+        //     method: 'DELETE',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        // });
+        // if (res.ok) {
+        //     toast.success('Attachment deleted successfully');
+        // }
+    }, []);
+
 
     return (
         <div className="relat ive w-full flex flex-col gap-4">
@@ -134,21 +155,26 @@ export default function ChatForm({
                         <AttachmentPreview
                             key={attachment.url}
                             attachment={attachment}
-                            handleDelete={() => setAttachments((prev) => prev.filter((a) => a.url !== attachment.url))}
+                            handleDelete={() => handleFileDelete(attachment)}
                         />
                     ))}
 
-                    {uploadQueue.map((file) => (
+                    {uploadQueue.map(({ file, controller }, i) => (
                         <AttachmentPreview
-                            key={file.name}
+                            key={i}
                             attachment={{
                                 url: URL.createObjectURL(file),
                                 name: file.name,
                                 contentType: file.type || 'image/png',
                             }}
                             isUploading={true}
+                            handleDelete={() => {
+                                controller.abort();
+                                setUploadQueue(prev => prev.filter((_, index) => index !== i));
+                            }}
                         />
                     ))}
+
                 </div>
             )}
 

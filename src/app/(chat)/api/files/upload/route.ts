@@ -1,5 +1,4 @@
 import { auth } from '@/auth';
-import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -42,22 +41,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: errorMessage }, { status: 400 });
         }
 
-        const filename = (formData.get('file') as File).name;
-        const fileBuffer = await file.arrayBuffer();
+        const res = await fetch(`${process.env.BACKEND_ENDPOINT}/api/v1/file/upload`, {
+            method: 'POST',
+            body: formData,
+        })
 
-        const uniqueFilename = `${Date.now()}_${filename}`;
-
-        try {
-            const data = await put(`${uniqueFilename}`, fileBuffer, {
-                access: 'public',
-            });
-
-            return NextResponse.json(data);
-        } catch (error) {
-            console.error(error)
-            return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+        if (!res.ok) {
+            return NextResponse.json(
+                { error: 'Failed to upload file' },
+                { status: res.status },
+            );
         }
+        const data = await res.json();
+        return NextResponse.json(data);
     } catch (error) {
+        console.log(error)
         return NextResponse.json(
             { error: 'Failed to process request' },
             { status: 500 },

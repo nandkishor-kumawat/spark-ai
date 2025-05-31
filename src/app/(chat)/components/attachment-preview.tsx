@@ -46,7 +46,7 @@ const AttachmentPreview = ({
                     </div>
                 )}
 
-                {handleDelete && !isUploading && <div
+                {handleDelete && <div
                     className='absolute p-0.5 z-40 hidden group-hover/attachment:flex inset-0 h-full items-center justify-center bg-zinc-600/80 transition-all duration-300 '>
                     <Button
                         type="button"

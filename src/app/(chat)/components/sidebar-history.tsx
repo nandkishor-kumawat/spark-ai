@@ -102,7 +102,10 @@ export default function SidebarHistory({ user }: SidebarHistoryProp) {
     const { data: history = [], isLoading, mutate } = useSWR<Chat[]>(
         user ? '/api/history' : null,
         fetcher,
-        { fallbackData: [] }
+        {
+            fallbackData: [],
+            revalidateOnFocus: false
+        }
     );
 
     useEffect(() => {

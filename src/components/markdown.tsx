@@ -175,7 +175,7 @@ export const NonMemoizedMarkdown1 = ({ children }: { children: string }) => {
 
 
                     if (node.tagName === "pre") {
-                        if ((node.children[0] as any).tagName === "code" && (node.children[1] as any).properties.class == "copied") {
+                        if ((node.children[0] as any).tagName === "code" && (node.children[1] as any).properties?.class == "copied") {
                             const code = node.children[0] as any
                             const copied = node.children[1]
                             const language = code?.properties?.className?.[0]?.split("-")[1]
@@ -245,7 +245,7 @@ export const NonMemoizedMarkdown1 = ({ children }: { children: string }) => {
     );
 };
 
-export const Markdown11 = memo(NonMemoizedMarkdown, (prevProps, nextProps) => prevProps.children === nextProps.children,);
-export const Markdown1 = memo(NonMemoizedMarkdown1, (prevProps, nextProps) => prevProps.children === nextProps.children,);
+export const Markdown11 = memo(NonMemoizedMarkdown, (prevProps, nextProps) => prevProps.children === nextProps.children);
+export const Markdown1 = memo(NonMemoizedMarkdown1, (prevProps, nextProps) => prevProps.children === nextProps.children);
 
 export const Markdown = Markdown11

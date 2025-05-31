@@ -4,6 +4,9 @@ const nextConfig = {
         remotePatterns: [
             {
                 hostname: "7z3o4zlblio0tkhp.public.blob.vercel-storage.com"
+            },
+            {
+                hostname: "firebasestorage.googleapis.com"
             }
         ]
     }
